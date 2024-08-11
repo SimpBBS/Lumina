@@ -1,0 +1,63 @@
+name: Build
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour at the start of the hour (UTC)
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # Only run on PRs if the source branch is from a different repository
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v3
+      
+      - name: Clone PaperMC/Folia Repository
+        run: git clone --branch dev/1.21 https://github.com/PaperMC/Folia.git
+      
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      
+      - name: Configure Git User Details
+      
+        run: |
+          cd Folia
+          git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+      
+      - name: Apply Patches
+        run: |
+          cd Folia
+          ./gradlew applyPatches  # Ensure this task exists
+      
+      - name: Build
+        run: |
+          cd Folia
+          ./gradlew createMojmapPaperclipJar
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4  # Using the latest version
+        with:
+          name: Spigot Artifacts
+          path: ./Folia/build/libs  # Ensure this path is correct
+
+      - name: Auto Release
+        uses: marvinpinto/action-automatic-releases@latest  # Using the latest stable version
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: latest
+          prerelease: false
+          files: ./Folia/build/libs
