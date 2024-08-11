@@ -17,8 +17,8 @@ jobs:
       - name: Checkout Git Repository
         uses: actions/checkout@v3
       
-      - name: Clone PaperMC/Folia Repository
-        run: git clone --branch dev/1.21 https://github.com/PaperMC/Folia.git
+      - name: Clone PaperMC/Lumina Repository
+        run: git clone --branch master https://github.com/LeavesMC/Lumina
       
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v3
@@ -35,24 +35,24 @@ jobs:
       - name: Configure Git User Details
       
         run: |
-          cd Folia
+          cd Lumina
           git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
       
       - name: Apply Patches
         run: |
-          cd Folia
+          cd Lumina
           ./gradlew applyPatches  # Ensure this task exists
       
       - name: Build
         run: |
-          cd Folia
+          cd Lumina
           ./gradlew createMojmapPaperclipJar
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4  # Using the latest version
         with:
           name: Spigot Artifacts
-          path: ./Folia/build/libs  # Ensure this path is correct
+          path: ./Lumina/build/libs  # Ensure this path is correct
 
       - name: Auto Release
         uses: marvinpinto/action-automatic-releases@latest  # Using the latest stable version
@@ -60,4 +60,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: latest
           prerelease: false
-          files: ./Folia/build/libs
+          files: ./Lumina/build/libs
