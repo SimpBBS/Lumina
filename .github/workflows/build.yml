@@ -51,7 +51,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4  # Using the latest version
         with:
-          name: Spigot Artifacts
+          name: Lumina Artifacts
           path: ./Lumina/build/libs  # Ensure this path is correct
 
       - name: Auto Release
