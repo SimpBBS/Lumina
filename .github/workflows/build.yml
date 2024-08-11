@@ -46,7 +46,7 @@ jobs:
       - name: Build
         run: |
           cd Lumina
-          ./gradlew createMojmapPaperclipJar
+          ./gradlew createMojmapLeavesclipJar
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4  # Using the latest version
